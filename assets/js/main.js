@@ -356,21 +356,89 @@ const parseMarkdown = md => {
   return html;
 };
 
-// ── الإعدادات الشخصية ─────────────────────────────────────────
+// ── الإعدادات الشخصية — Single Source of Truth ─────────────────
 const loadSettings = async () => {
   try {
     const res = await fetch(base + 'data/settings.json');
     if (!res.ok) return;
     const s = await res.json();
+
+    // ١. كل العناصر التي تحمل data-settings="fieldName"
+    document.querySelectorAll('[data-settings]').forEach(el => {
+      const field = el.getAttribute('data-settings');
+      const attr  = el.getAttribute('data-settings-attr'); // مثل src للصور
+      const val   = s[field];
+      if (val === undefined || val === null || val === '') return;
+      if (attr) { el.setAttribute(attr, val); }
+      else { el.textContent = val; }
+    });
+
+    // ٢. الاسم في كل nav bars
     document.querySelectorAll('.nav-logo-name').forEach(el => el.textContent = s.name || '');
-    const heroImg = document.querySelector('.hero-photo img');
-    if (heroImg && s.photo) heroImg.src = s.photo;
+
+    // ٣. الصورة الشخصية في الهيرو (fallback)
+    document.querySelectorAll('.hero-photo img').forEach(img => {
+      if (s.photo) img.src = s.photo;
+    });
+
+    // ٤. النبذة في الهيرو (fallback)
     const heroDesc = document.querySelector('.hero-desc');
-    if (heroDesc && s.hero_bio) heroDesc.textContent = s.hero_bio;
-    // الفوتر
-    document.querySelectorAll('.footer-email').forEach(el => el.textContent = s.email || '');
-    document.querySelectorAll('.footer-address').forEach(el => el.textContent = s.address || '');
-  } catch (e) {}
+    if (heroDesc && s.hero_bio && !heroDesc.getAttribute('data-settings')) {
+      heroDesc.textContent = s.hero_bio;
+    }
+
+    // ٥. الإحصائيات في الهيرو
+    const statEls = document.querySelectorAll('.stat-num[data-target]');
+    const statMap = [
+      { el: statEls[0], field: 'stat_years'    },
+      { el: statEls[1], field: 'stat_sessions' },
+      { el: statEls[2], field: 'stat_training' },
+    ];
+    statMap.forEach(({ el, field }) => {
+      if (!el || !s[field]) return;
+      const num = parseInt(s[field]);
+      if (!isNaN(num)) el.dataset.target = num;
+    });
+
+    // ٦. روابط التواصل الاجتماعي
+    const socialLinks = [
+      { key: 'twitter',   icon: 'X',  label: 'تويتر',   url: s.twitter   ? `https://twitter.com/${s.twitter}`       : '' },
+      { key: 'instagram', icon: 'IG', label: 'إنستغرام', url: s.instagram ? `https://instagram.com/${s.instagram}`   : '' },
+      { key: 'linkedin',  icon: 'in', label: 'لينكدإن',  url: s.linkedin  ? `https://linkedin.com/in/${s.linkedin}`  : '' },
+      { key: 'youtube',   icon: 'YT', label: 'يوتيوب',   url: s.youtube   ? `https://youtube.com/@${s.youtube}`     : '' },
+      { key: 'snapchat',  icon: 'SC', label: 'سناب',     url: s.snapchat  ? `https://snapchat.com/add/${s.snapchat}` : '' },
+    ].filter(({ url }) => url);
+
+    const socialHTML = socialLinks.map(({ icon, label, url }) =>
+      `<a href="${url}" target="_blank" rel="noopener" class="footer-social" title="${label}">${icon}</a>`
+    ).join('');
+
+    // ٧. حقن الروابط في كل أماكن التواصل
+    ['footer-socials-home', 'footer-socials', 'contact-socials'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = socialHTML;
+    });
+
+    // ٨. شارة "متاح" في الهيرو
+    const badge = document.querySelector('.hero-badge');
+    if (badge && s.name) {
+      badge.querySelector(':last-child') && (badge.lastChild.textContent = ` متاح للاستشارات`);
+    }
+
+    // ٩. Footer copyright
+    document.querySelectorAll('.footer-bottom span:first-child').forEach(el => {
+      const year = new Date().getFullYear();
+      el.textContent = `${year} © ${s.name || 'أ. محمد القحطاني'} — جميع الحقوق محفوظة`;
+    });
+
+    // ١٠. Footer logo
+    document.querySelectorAll('.footer-logo').forEach(el => {
+      el.textContent = s.name || '';
+    });
+
+  } catch (e) {
+    console.warn('Settings load failed:', e);
+  }
 };
 
 // ── مشاركة ────────────────────────────────────────────────────
