@@ -1,0 +1,175 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# رفع الصور والملفات
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+# اللغة والمظهر
+locale: ar
+
+collections:
+
+  # ═══════════════════════════════
+  # المقالات
+  # ═══════════════════════════════
+  - name: "articles"
+    label: "📝 المقالات"
+    label_singular: "مقال"
+    folder: "_articles"
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: "العنوان", name: "title", widget: "string", hint: "عنوان المقال كما سيظهر في الموقع" }
+      - { label: "المقدمة المختصرة", name: "excerpt", widget: "text", hint: "جملة أو جملتان تظهران في بطاقة المقال" }
+      - label: "التصنيف"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "القلق", value: "القلق" }
+          - { label: "الاكتئاب", value: "الاكتئاب" }
+          - { label: "العلاقات", value: "العلاقات" }
+          - { label: "التطوير الذاتي", value: "التطوير الذاتي" }
+          - { label: "الأطفال", value: "الأطفال" }
+          - { label: "علاج الإدمان", value: "علاج الإدمان" }
+          - { label: "التقييم النفسي", value: "التقييم النفسي" }
+      - label: "لون التصنيف"
+        name: "categoryColor"
+        widget: "select"
+        options:
+          - { label: "أزرق داكن", value: "#1B2D4F" }
+          - { label: "أخضر مائي", value: "#3D9B8F" }
+          - { label: "ذهبي", value: "#B8976A" }
+          - { label: "رمادي", value: "#5C6070" }
+      - { label: "تاريخ النشر", name: "date", widget: "datetime", format: "DD MMMM YYYY", hint: "سيظهر بالتنسيق العربي" }
+      - { label: "وقت القراءة (بالدقائق)", name: "readTime", widget: "number", default: 5, value_type: "int" }
+      - { label: "الكاتب", name: "author", widget: "string", default: "أ. محمد القحطاني" }
+      - { label: "صورة المقال", name: "image", widget: "image", required: false }
+      - label: "الوسوم"
+        name: "tags"
+        widget: "list"
+        hint: "أضف وسوماً للمقال مفصولة بفاصلة"
+      - { label: "مقال مميز؟", name: "featured", widget: "boolean", default: false }
+      - { label: "محتوى المقال", name: "body", widget: "markdown", hint: "اكتب محتوى المقال هنا بتنسيق Markdown" }
+      - label: "المراجع العلمية"
+        name: "references"
+        widget: "list"
+        required: false
+        hint: "أضف مرجعاً في كل سطر"
+
+  # ═══════════════════════════════
+  # المكتبة العلمية
+  # ═══════════════════════════════
+  - name: "library"
+    label: "📚 المكتبة العلمية"
+    label_singular: "ملف"
+    folder: "_library"
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: "اسم الملف", name: "title", widget: "string" }
+      - { label: "وصف مختصر", name: "description", widget: "text" }
+      - label: "نوع الملف"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "PDF", value: "PDF" }
+          - { label: "PPT عرض تقديمي", value: "PPT" }
+          - { label: "DOC وورد", value: "DOC" }
+          - { label: "XLS إكسل", value: "XLS" }
+      - label: "التصنيف"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "📋 أدلة إرشادية", value: "أدلة إرشادية" }
+          - { label: "🎓 مواد تدريبية", value: "مواد تدريبية" }
+          - { label: "📐 مقاييس نفسية", value: "مقاييس نفسية" }
+          - { label: "📊 عروض تقديمية", value: "عروض تقديمية" }
+          - { label: "📗 كتب", value: "كتب" }
+      - label: "لون الأيقونة"
+        name: "color"
+        widget: "select"
+        options:
+          - { label: "أخضر مائي", value: "#3D9B8F" }
+          - { label: "ذهبي", value: "#B8976A" }
+          - { label: "أزرق داكن", value: "#1B2D4F" }
+      - { label: "الملف للتحميل", name: "file", widget: "file", hint: "ارفع الملف هنا" }
+      - { label: "حجم الملف (مثال: 2.4 MB)", name: "size", widget: "string" }
+      - { label: "تاريخ الإضافة", name: "date", widget: "datetime", format: "MMMM YYYY" }
+
+  # ═══════════════════════════════
+  # الدورات وورش العمل
+  # ═══════════════════════════════
+  - name: "courses"
+    label: "🎓 الدورات وورش العمل"
+    label_singular: "دورة"
+    folder: "_courses"
+    create: true
+    slug: "{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: "عنوان الدورة", name: "title", widget: "string" }
+      - { label: "وصف مختصر", name: "description", widget: "text" }
+      - label: "الحالة"
+        name: "status"
+        widget: "select"
+        options:
+          - { label: "🟡 قادم", value: "قادم" }
+          - { label: "🟢 جارٍ", value: "جارٍ" }
+          - { label: "⚫ منتهٍ", value: "منتهٍ" }
+      - label: "لون الحالة"
+        name: "statusColor"
+        widget: "select"
+        options:
+          - { label: "ذهبي (قادم)", value: "#B8976A" }
+          - { label: "أخضر (جارٍ)", value: "#3D9B8F" }
+          - { label: "رمادي (منتهٍ)", value: "#5C6070" }
+      - { label: "التاريخ", name: "date", widget: "string", hint: "مثال: ١٠ أغسطس ٢٠٢٦" }
+      - { label: "المدة", name: "duration", widget: "string", hint: "مثال: ٣ ساعات أو ٥ أيام" }
+      - label: "طريقة التقديم"
+        name: "mode"
+        widget: "select"
+        options:
+          - { label: "أونلاين", value: "أونلاين" }
+          - { label: "حضوري", value: "حضوري" }
+          - { label: "هجين", value: "هجين" }
+      - { label: "صورة الدورة", name: "image", widget: "image", required: false }
+
+  # ═══════════════════════════════
+  # إعدادات الموقع
+  # ═══════════════════════════════
+  - name: "settings"
+    label: "⚙️ إعدادات الموقع"
+    files:
+      - label: "المعلومات الشخصية"
+        name: "personal"
+        file: "_data/personal.yml"
+        editor:
+          preview: false
+        fields:
+          - { label: "الاسم الكامل", name: "name", widget: "string" }
+          - { label: "اللقب المهني", name: "title", widget: "string" }
+          - { label: "نبذة مختصرة (للرئيسية)", name: "hero_bio", widget: "text" }
+          - { label: "نبذة كاملة (لصفحة عني)", name: "full_bio", widget: "text" }
+          - { label: "البريد الإلكتروني", name: "email", widget: "string" }
+          - { label: "العنوان", name: "address", widget: "string" }
+          - { label: "أوقات العمل", name: "hours", widget: "string" }
+          - { label: "الصورة الشخصية", name: "photo", widget: "image" }
+          - { label: "سنوات الخبرة", name: "stat_years", widget: "number" }
+          - { label: "عدد الجلسات", name: "stat_sessions", widget: "number" }
+          - { label: "ساعات التدريب", name: "stat_training", widget: "number" }
+          - label: "حسابات التواصل الاجتماعي"
+            name: "social"
+            widget: "object"
+            fields:
+              - { label: "تويتر/X", name: "twitter", widget: "string", required: false }
+              - { label: "إنستغرام", name: "instagram", widget: "string", required: false }
+              - { label: "لينكدإن", name: "linkedin", widget: "string", required: false }
+              - { label: "يوتيوب", name: "youtube", widget: "string", required: false }
+              - { label: "سناب شات", name: "snapchat", widget: "string", required: false }
