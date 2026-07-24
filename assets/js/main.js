@@ -401,22 +401,29 @@ const loadSettings = async () => {
     });
 
     // ٦. روابط التواصل الاجتماعي
-    const socialLinks = [
-      { key: 'twitter',   icon: 'X',  label: 'تويتر',   url: s.twitter   ? `https://twitter.com/${s.twitter}`       : '' },
-      { key: 'instagram', icon: 'IG', label: 'إنستغرام', url: s.instagram ? `https://instagram.com/${s.instagram}`   : '' },
-      { key: 'linkedin',  icon: 'in', label: 'لينكدإن',  url: s.linkedin  ? `https://linkedin.com/in/${s.linkedin}`  : '' },
-      { key: 'youtube',   icon: 'YT', label: 'يوتيوب',   url: s.youtube   ? `https://youtube.com/@${s.youtube}`     : '' },
-      { key: 'snapchat',  icon: 'SC', label: 'سناب',     url: s.snapchat  ? `https://snapchat.com/add/${s.snapchat}` : '' },
-    ].filter(({ url }) => url);
+    const socialDefs = [
+      { key: 'twitter',   icon: 'X',   label: 'تويتر / X',  build: v => `https://x.com/${v}`                },
+      { key: 'instagram', icon: 'IG',  label: 'إنستغرام',   build: v => `https://instagram.com/${v}`        },
+      { key: 'tiktok',    icon: 'TK',  label: 'تيك توك',    build: v => `https://tiktok.com/@${v}`          },
+      { key: 'linkedin',  icon: 'in',  label: 'لينكدإن',    build: v => `https://linkedin.com/in/${v}`      },
+      { key: 'youtube',   icon: 'YT',  label: 'يوتيوب',     build: v => `https://youtube.com/@${v}`         },
+      { key: 'snapchat',  icon: 'SC',  label: 'سناب شات',   build: v => `https://snapchat.com/add/${v}`     },
+    ];
+
+    const socialLinks = socialDefs
+      .filter(({ key }) => s[key] && s[key].trim() !== '')
+      .map(({ key, icon, label, build }) => ({
+        icon, label,
+        url: s[key].startsWith('http') ? s[key] : build(s[key].trim())
+      }));
 
     const socialHTML = socialLinks.map(({ icon, label, url }) =>
-      `<a href="${url}" target="_blank" rel="noopener" class="footer-social" title="${label}">${icon}</a>`
+      `<a href="${url}" target="_blank" rel="noopener noreferrer" class="footer-social" title="${label}" aria-label="${label}">${icon}</a>`
     ).join('');
 
-    // ٧. حقن الروابط في كل أماكن التواصل
-    ['footer-socials-home', 'footer-socials', 'contact-socials'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = socialHTML;
+    // ٧. حقن الروابط في كل صفحة — ابحث عن أي عنصر id يبدأ بـ footer-socials أو contact-socials
+    document.querySelectorAll('[id^="footer-socials"], [id^="contact-socials"]').forEach(el => {
+      el.innerHTML = socialHTML;
     });
 
     // ٨. شارة "متاح" في الهيرو

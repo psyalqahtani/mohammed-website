@@ -241,6 +241,7 @@ collections:
           - { label: "ساعات التدريب", name: "stat_training", widget: "string" }
           - { label: "تويتر / X", name: "twitter", widget: "string", required: false }
           - { label: "إنستغرام", name: "instagram", widget: "string", required: false }
+          - { label: "تيك توك", name: "tiktok", widget: "string", required: false }
           - { label: "لينكدإن", name: "linkedin", widget: "string", required: false }
           - { label: "يوتيوب", name: "youtube", widget: "string", required: false }
           - { label: "سناب شات", name: "snapchat", widget: "string", required: false }
