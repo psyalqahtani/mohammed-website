@@ -484,18 +484,22 @@ window.copyLink = () => {
 // ══════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   initLoader();
   initNav();
   initMobileDrawer();
   initSearch();
   initReveal();
-  initStats();
   initReadingBar();
   initContactForm();
-  loadSettings();
   document.querySelectorAll('.btn-dark-toggle').forEach(b => b.addEventListener('click', toggleDark));
+
+  // loadSettings أولاً — تُحدّث data-target بالأرقام الصحيحة من settings.json
+  await loadSettings();
+
+  // initStats بعدها — تقرأ data-target المحدّثة
+  initStats();
 
   // ── الرئيسية ──
   const homeArticles = document.getElementById('home-articles-grid');
