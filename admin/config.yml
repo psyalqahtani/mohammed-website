@@ -9,168 +9,144 @@ locale: ar
 
 collections:
 
-  # ═══════════════════════════════
-  # المقالات
-  # ═══════════════════════════════
   - name: "articles"
     label: "📝 المقالات"
     label_singular: "مقال"
-    folder: "data/articles"
-    create: true
-    slug: "{{slug}}"
-    extension: "json"
-    format: "json"
-    editor:
-      preview: false
-    fields:
-      - { label: "العنوان", name: "title", widget: "string" }
-      - { label: "مقدمة مختصرة", name: "excerpt", widget: "text", hint: "جملتان تظهران في بطاقة المقال" }
-      - label: "التصنيف"
-        name: "category"
-        widget: "select"
-        options:
-          - { label: "القلق", value: "القلق" }
-          - { label: "الاكتئاب", value: "الاكتئاب" }
-          - { label: "العلاقات", value: "العلاقات" }
-          - { label: "التطوير الذاتي", value: "التطوير الذاتي" }
-          - { label: "الأطفال", value: "الأطفال" }
-          - { label: "علاج الإدمان", value: "علاج الإدمان" }
-          - { label: "التقييم النفسي", value: "التقييم النفسي" }
-      - label: "لون التصنيف"
-        name: "categoryColor"
-        widget: "select"
-        options:
-          - { label: "أزرق داكن", value: "#1B2D4F" }
-          - { label: "أخضر مائي", value: "#3D9B8F" }
-          - { label: "ذهبي", value: "#B8976A" }
-          - { label: "رمادي", value: "#5C6070" }
-      - { label: "صورة المقال", name: "image", widget: "image", required: false, hint: "صورة تظهر في بطاقة المقال وأعلى الصفحة" }
-      - { label: "تاريخ النشر", name: "date", widget: "string", hint: "مثال: ١٨ يوليو ٢٠٢٦" }
-      - { label: "وقت القراءة", name: "readTime", widget: "string", hint: "مثال: ٥ دقائق قراءة" }
-      - { label: "الكاتب", name: "author", widget: "string", default: "أ. محمد القحطاني" }
-      - { label: "محتوى المقال", name: "body", widget: "markdown" }
-      - label: "المراجع العلمية"
-        name: "references"
-        widget: "list"
-        required: false
-        field: { label: "مرجع", name: "ref", widget: "string" }
-      - label: "الوسوم"
-        name: "tags"
-        widget: "list"
-        required: false
-        field: { label: "وسم", name: "tag", widget: "string" }
-      - { label: "مقال مميز؟", name: "featured", widget: "boolean", default: false }
+    files:
+      - label: "قائمة المقالات"
+        name: "articles"
+        file: "data/articles.json"
+        fields:
+          - label: "المقالات"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "المعرف", name: "id", widget: "number" }
+              - { label: "العنوان", name: "title", widget: "string" }
+              - { label: "الرابط (slug)", name: "slug", widget: "string", hint: "بالإنجليزي بدون مسافات مثال: my-article" }
+              - { label: "مقدمة مختصرة", name: "excerpt", widget: "text" }
+              - label: "التصنيف"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "القلق", value: "القلق" }
+                  - { label: "الاكتئاب", value: "الاكتئاب" }
+                  - { label: "العلاقات", value: "العلاقات" }
+                  - { label: "التطوير الذاتي", value: "التطوير الذاتي" }
+                  - { label: "الأطفال", value: "الأطفال" }
+                  - { label: "علاج الإدمان", value: "علاج الإدمان" }
+              - label: "لون التصنيف"
+                name: "categoryColor"
+                widget: "select"
+                options:
+                  - { label: "أزرق داكن", value: "#1B2D4F" }
+                  - { label: "أخضر مائي", value: "#3D9B8F" }
+                  - { label: "ذهبي", value: "#B8976A" }
+                  - { label: "رمادي", value: "#5C6070" }
+              - { label: "صورة المقال", name: "image", widget: "image", required: false }
+              - { label: "تاريخ النشر", name: "date", widget: "string" }
+              - { label: "وقت القراءة", name: "readTime", widget: "string" }
+              - { label: "الكاتب", name: "author", widget: "string", default: "أ. محمد القحطاني" }
+              - { label: "محتوى المقال", name: "body", widget: "markdown" }
+              - label: "المراجع"
+                name: "references"
+                widget: "list"
+                required: false
+                field: { label: "مرجع", name: "ref", widget: "string" }
 
-  # ═══════════════════════════════
-  # المكتبة العلمية
-  # ═══════════════════════════════
   - name: "library"
     label: "📚 المكتبة العلمية"
-    label_singular: "ملف"
-    folder: "data/library"
-    create: true
-    slug: "{{slug}}"
-    extension: "json"
-    format: "json"
-    editor:
-      preview: false
-    fields:
-      - { label: "اسم الملف أو المادة", name: "title", widget: "string" }
-      - { label: "وصف مختصر", name: "description", widget: "text" }
-      - label: "نوع الملف"
-        name: "type"
-        widget: "select"
-        options:
-          - { label: "PDF", value: "PDF" }
-          - { label: "PPT عرض تقديمي", value: "PPT" }
-          - { label: "DOC وورد", value: "DOC" }
-          - { label: "XLS إكسل", value: "XLS" }
-      - label: "التصنيف"
-        name: "category"
-        widget: "select"
-        options:
-          - { label: "📋 أدلة إرشادية", value: "أدلة إرشادية" }
-          - { label: "🎓 مواد تدريبية", value: "مواد تدريبية" }
-          - { label: "📐 مقاييس نفسية", value: "مقاييس نفسية" }
-          - { label: "📊 عروض تقديمية", value: "عروض تقديمية" }
-          - { label: "📗 كتب", value: "كتب" }
-      - label: "لون الأيقونة"
-        name: "color"
-        widget: "select"
-        options:
-          - { label: "أخضر مائي", value: "#3D9B8F" }
-          - { label: "ذهبي", value: "#B8976A" }
-          - { label: "أزرق داكن", value: "#1B2D4F" }
-      - { label: "صورة أو أيقونة مخصصة", name: "image", widget: "image", required: false }
-      - { label: "الملف للتحميل", name: "file", widget: "file", required: false, hint: "ارفع الملف هنا" }
-      - { label: "حجم الملف", name: "size", widget: "string", hint: "مثال: 2.4 MB" }
-      - { label: "تاريخ الإضافة", name: "date", widget: "string", hint: "مثال: يوليو ٢٠٢٦" }
+    files:
+      - label: "قائمة الملفات"
+        name: "files"
+        file: "data/files.json"
+        fields:
+          - label: "الملفات"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "المعرف", name: "id", widget: "number" }
+              - { label: "الاسم", name: "title", widget: "string" }
+              - { label: "وصف مختصر", name: "description", widget: "text" }
+              - label: "النوع"
+                name: "type"
+                widget: "select"
+                options: ["PDF", "PPT", "DOC", "XLS"]
+              - label: "التصنيف"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "أدلة إرشادية", value: "أدلة إرشادية" }
+                  - { label: "مواد تدريبية", value: "مواد تدريبية" }
+                  - { label: "مقاييس نفسية", value: "مقاييس نفسية" }
+                  - { label: "عروض تقديمية", value: "عروض تقديمية" }
+                  - { label: "كتب", value: "كتب" }
+              - label: "لون الأيقونة"
+                name: "color"
+                widget: "select"
+                options:
+                  - { label: "أخضر", value: "#3D9B8F" }
+                  - { label: "ذهبي", value: "#B8976A" }
+                  - { label: "أزرق", value: "#1B2D4F" }
+              - { label: "الملف للتحميل", name: "file", widget: "file", required: false }
+              - { label: "صورة مخصصة", name: "image", widget: "image", required: false }
+              - { label: "الحجم", name: "size", widget: "string" }
+              - { label: "التاريخ", name: "date", widget: "string" }
 
-  # ═══════════════════════════════
-  # الدورات وورش العمل
-  # ═══════════════════════════════
   - name: "courses"
-    label: "🎓 الدورات وورش العمل"
-    label_singular: "دورة"
-    folder: "data/courses"
-    create: true
-    slug: "{{slug}}"
-    extension: "json"
-    format: "json"
-    editor:
-      preview: false
-    fields:
-      - { label: "عنوان الدورة", name: "title", widget: "string" }
-      - { label: "وصف مختصر", name: "description", widget: "text" }
-      - label: "الحالة"
-        name: "status"
-        widget: "select"
-        options:
-          - { label: "🟡 قادم", value: "قادم" }
-          - { label: "🟢 جارٍ", value: "جارٍ" }
-          - { label: "⚫ منتهٍ", value: "منتهٍ" }
-      - label: "لون الحالة"
-        name: "statusColor"
-        widget: "select"
-        options:
-          - { label: "ذهبي (قادم)", value: "#B8976A" }
-          - { label: "أخضر (جارٍ)", value: "#3D9B8F" }
-          - { label: "رمادي (منتهٍ)", value: "#5C6070" }
-      - { label: "صورة الدورة", name: "image", widget: "image", required: false }
-      - { label: "التاريخ", name: "date", widget: "string", hint: "مثال: ١٠ أغسطس ٢٠٢٦" }
-      - { label: "المدة", name: "duration", widget: "string", hint: "مثال: ٣ ساعات" }
-      - label: "طريقة التقديم"
-        name: "mode"
-        widget: "select"
-        options:
-          - { label: "أونلاين", value: "أونلاين" }
-          - { label: "حضوري", value: "حضوري" }
-          - { label: "هجين", value: "هجين" }
+    label: "🎓 الدورات"
+    files:
+      - label: "قائمة الدورات"
+        name: "courses"
+        file: "data/courses.json"
+        fields:
+          - label: "الدورات"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "المعرف", name: "id", widget: "number" }
+              - { label: "العنوان", name: "title", widget: "string" }
+              - { label: "الوصف", name: "description", widget: "text" }
+              - label: "الحالة"
+                name: "status"
+                widget: "select"
+                options:
+                  - { label: "قادم", value: "قادم" }
+                  - { label: "جارٍ", value: "جارٍ" }
+                  - { label: "منتهٍ", value: "منتهٍ" }
+              - label: "لون الحالة"
+                name: "statusColor"
+                widget: "select"
+                options:
+                  - { label: "ذهبي", value: "#B8976A" }
+                  - { label: "أخضر", value: "#3D9B8F" }
+                  - { label: "رمادي", value: "#5C6070" }
+              - { label: "صورة", name: "image", widget: "image", required: false }
+              - { label: "التاريخ", name: "date", widget: "string" }
+              - { label: "المدة", name: "duration", widget: "string" }
+              - label: "الطريقة"
+                name: "mode"
+                widget: "select"
+                options: ["أونلاين", "حضوري", "هجين"]
 
-  # ═══════════════════════════════
-  # إعدادات الموقع
-  # ═══════════════════════════════
   - name: "settings"
     label: "⚙️ إعدادات الموقع"
     files:
       - label: "المعلومات الشخصية"
         name: "personal"
         file: "data/settings.json"
-        editor:
-          preview: false
         fields:
-          - { label: "الاسم الكامل", name: "name", widget: "string" }
+          - { label: "الاسم", name: "name", widget: "string" }
           - { label: "اللقب المهني", name: "title", widget: "string" }
-          - { label: "نبذة مختصرة (الرئيسية)", name: "hero_bio", widget: "text" }
-          - { label: "البريد الإلكتروني", name: "email", widget: "string" }
+          - { label: "النبذة", name: "hero_bio", widget: "text" }
+          - { label: "البريد", name: "email", widget: "string" }
           - { label: "العنوان", name: "address", widget: "string" }
           - { label: "أوقات العمل", name: "hours", widget: "string" }
           - { label: "الصورة الشخصية", name: "photo", widget: "image" }
           - { label: "سنوات الخبرة", name: "stat_years", widget: "string" }
           - { label: "عدد الجلسات", name: "stat_sessions", widget: "string" }
           - { label: "ساعات التدريب", name: "stat_training", widget: "string" }
-          - { label: "تويتر / X", name: "twitter", widget: "string", required: false }
+          - { label: "تويتر", name: "twitter", widget: "string", required: false }
           - { label: "إنستغرام", name: "instagram", widget: "string", required: false }
           - { label: "لينكدإن", name: "linkedin", widget: "string", required: false }
           - { label: "يوتيوب", name: "youtube", widget: "string", required: false }
-          - { label: "سناب شات", name: "snapchat", widget: "string", required: false }

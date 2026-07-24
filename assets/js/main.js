@@ -1,34 +1,31 @@
 /* ============================================================
-   MAIN.JS — أ. محمد القحطاني
-   النظام: يقرأ من data/articles/*.json و data/library/*.json
+   MAIN.JS — النظام النهائي البسيط
+   يقرأ من data/articles.json مباشرة — لا manifest
    ============================================================ */
 
-// ── Dark Mode ─────────────────────────────────────────────────
 const toggleDark = () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
   document.querySelectorAll('.btn-dark-toggle').forEach(b => b.textContent = next === 'dark' ? '☀️' : '🌙');
 };
+
 const initTheme = () => {
-  const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', t);
   document.querySelectorAll('.btn-dark-toggle').forEach(b => b.textContent = t === 'dark' ? '☀️' : '🌙');
 };
 
-// ── Loader ────────────────────────────────────────────────────
 const initLoader = () => {
   const l = document.getElementById('page-loader');
   if (l) setTimeout(() => l.classList.add('hidden'), 700);
 };
 
-// ── Nav ───────────────────────────────────────────────────────
 const initNav = () => {
   const nav = document.querySelector('.nav');
   if (nav) window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 80), { passive: true });
 };
 
-// ── Mobile Drawer ─────────────────────────────────────────────
 const initMobileDrawer = () => {
   const h = document.querySelector('.nav-hamburger');
   const d = document.querySelector('.mobile-drawer');
@@ -39,7 +36,6 @@ const initMobileDrawer = () => {
   d.querySelectorAll('a').forEach(a => a.addEventListener('click', () => d.classList.remove('open')));
 };
 
-// ── Search Overlay ────────────────────────────────────────────
 const initSearch = () => {
   const ov = document.querySelector('.search-overlay');
   if (!ov) return;
@@ -50,7 +46,6 @@ const initSearch = () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') ov.classList.remove('open'); });
 };
 
-// ── Scroll Reveal ─────────────────────────────────────────────
 const initReveal = () => {
   const els = document.querySelectorAll('.reveal:not(.visible)');
   if (!els.length) return;
@@ -60,7 +55,6 @@ const initReveal = () => {
   els.forEach(el => io.observe(el));
 };
 
-// ── Stats Counter ─────────────────────────────────────────────
 const initStats = () => {
   const wrap = document.querySelector('.hero-stats');
   if (!wrap) return;
@@ -71,15 +65,13 @@ const initStats = () => {
       const target = parseInt(el.dataset.target), suffix = el.dataset.suffix || '';
       let i = 0;
       const t = setInterval(() => {
-        i++; const p = 1 - Math.pow(1 - i / 30, 2);
-        el.textContent = Math.round(target * p) + suffix;
+        i++; el.textContent = Math.round(target * (1 - Math.pow(1 - i/30, 2))) + suffix;
         if (i >= 30) { el.textContent = target + suffix; clearInterval(t); }
-      }, 1400 / 30);
+      }, 1400/30);
     });
   }, { threshold: 0.4 }).observe(wrap);
 };
 
-// ── Reading Bar ───────────────────────────────────────────────
 const initReadingBar = () => {
   const bar = document.querySelector('.reading-bar');
   if (!bar) return;
@@ -89,19 +81,17 @@ const initReadingBar = () => {
   }, { passive: true });
 };
 
-// ── Contact Form ──────────────────────────────────────────────
 const initContactForm = () => {
   const form = document.querySelector('.contact-form form');
   if (!form) return;
   form.addEventListener('submit', e => {
     e.preventDefault();
     const btn = form.querySelector('.btn-submit');
-    btn.textContent = '✓ تم الإرسال بنجاح'; btn.style.background = '#22c55e';
+    btn.textContent = '✓ تم الإرسال'; btn.style.background = '#22c55e';
     setTimeout(() => { btn.textContent = 'إرسال الرسالة'; btn.style.background = ''; form.reset(); }, 3000);
   });
 };
 
-// ── Filter Chips ──────────────────────────────────────────────
 const initChips = (sel, cb) => {
   const c = document.querySelector(sel);
   if (!c) return;
@@ -113,7 +103,6 @@ const initChips = (sel, cb) => {
   });
 };
 
-// ── Category Sidebar ──────────────────────────────────────────
 const initCategorySidebar = cb => {
   document.querySelectorAll('.cat-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -124,67 +113,57 @@ const initCategorySidebar = cb => {
 };
 
 // ══════════════════════════════════════════════════════════════
-// DATA LOADING — يقرأ من ملفات JSON الفردية في data/articles/
+// قراءة البيانات — مباشرة من JSON بدون manifest
 // ══════════════════════════════════════════════════════════════
 
-/* قراءة قائمة ملفات JSON من مجلد معين عبر GitHub API أو manifest */
-const loadJSONFiles = async (folder, base) => {
-  // نحاول نقرأ manifest.json أولاً (قائمة الملفات)
-  try {
-    const manifest = await fetch(`${base}${folder}/manifest.json`).then(r => r.ok ? r.json() : null);
-    if (manifest && Array.isArray(manifest)) {
-      const results = await Promise.all(
-        manifest.map(f => fetch(`${base}${folder}/${f}`).then(r => r.ok ? r.json() : null))
-      );
-      return results.filter(Boolean);
-    }
-  } catch(e) {}
-
-  // fallback: قراءة ملف index.json
-  try {
-    const index = await fetch(`${base}${folder}/index.json`).then(r => r.ok ? r.json() : null);
-    if (index) return Array.isArray(index) ? index : [];
-  } catch(e) {}
-
-  return [];
+const getBase = () => {
+  const p = window.location.pathname;
+  return (p.includes('/blog/') || p.includes('/library/') || 
+          p.includes('/courses/') || p.includes('/contact/') || 
+          p.includes('/about/')) ? '../' : '';
 };
 
-/* بناء بطاقة مقال */
+const fetchData = async (file) => {
+  const res = await fetch(getBase() + 'data/' + file);
+  if (!res.ok) return [];
+  const data = await res.json();
+  // يدعم كلا الصيغتين: مصفوفة مباشرة أو { items: [] }
+  return Array.isArray(data) ? data : (data.items || []);
+};
+
+// بطاقة مقال
 const articleCard = (a, linkPrefix = '') => `
   <article class="article-card reveal">
     <div class="article-card-img">
-      ${a.image
-        ? `<img src="${a.image}" alt="${a.title}" loading="lazy">`
-        : `<div class="article-card-img-placeholder">📝</div>`}
+      ${a.image ? `<img src="${a.image}" alt="${a.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` 
+                : `<div class="article-card-img-placeholder">📝</div>`}
       <span class="article-card-cat" style="background:${a.categoryColor||'#1B2D4F'}">${a.category||''}</span>
     </div>
     <div class="article-card-body">
       <h3 class="article-card-title">
-        <a href="${linkPrefix}article.html?slug=${a.slug||a.id||''}" style="color:inherit">${a.title}</a>
+        <a href="${linkPrefix}article.html?slug=${a.slug||a.id}" style="color:inherit">${a.title}</a>
       </h3>
       <p class="article-card-excerpt">${a.excerpt||''}</p>
       <div class="article-card-meta"><span>${a.readTime||''}</span><span>${a.date||''}</span></div>
     </div>
   </article>`;
 
-/* بناء بطاقة ملف */
+// بطاقة ملف
 const fileCard = f => `
   <div class="file-card reveal">
-    ${f.image
-      ? `<img src="${f.image}" alt="${f.title}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px">`
-      : `<div class="file-icon" style="background:${f.color||'#3D9B8F'}">${f.type||'PDF'}</div>`}
+    ${f.image ? `<img src="${f.image}" alt="${f.title}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px">`
+              : `<div class="file-icon" style="background:${f.color||'#3D9B8F'}">${f.type||'PDF'}</div>`}
     <h4 class="file-title">${f.title}</h4>
     <p class="file-desc">${f.description||''}</p>
     <div class="file-meta">${f.size||''} · ${f.date||''}</div>
-    ${f.file
-      ? `<a href="${f.file}" class="btn-download" download>تحميل ↓</a>`
-      : `<button class="btn-download">تحميل ↓</button>`}
+    ${f.file ? `<a href="${f.file}" class="btn-download" download>تحميل ↓</a>`
+             : `<button class="btn-download">تحميل ↓</button>`}
   </div>`;
 
-/* بناء بطاقة دورة */
+// بطاقة دورة
 const courseCard = c => `
   <div class="course-card reveal">
-    <div class="course-card-img" style="${c.image ? `background:url(${c.image}) center/cover` : ''}">
+    <div class="course-card-img" style="${c.image?`background:url(${c.image}) center/cover`:''}">
       <span class="course-card-status" style="background:${c.statusColor||'#B8976A'}">${c.status||''}</span>
     </div>
     <div class="course-card-body">
@@ -192,89 +171,56 @@ const courseCard = c => `
       <p class="course-card-desc">${c.description||''}</p>
       <div class="course-card-meta">${c.date||''} · ${c.duration||''} · ${c.mode||''}</div>
       <button class="btn-primary" style="font-size:14px;padding:10px 24px">
-        ${c.status === 'منتهٍ' ? 'عرض التفاصيل' : 'التسجيل الآن'}
+        ${c.status==='منتهٍ'?'عرض التفاصيل':'التسجيل الآن'}
       </button>
     </div>
   </div>`;
 
-// ── Render Articles ────────────────────────────────────────────
+// عرض المقالات
 const renderArticles = async (container, filter = 'الكل', searchQ = '') => {
   if (!container) return;
-  const isHome = container.id === 'home-articles-grid';
-  const base = isHome ? '' : '../';
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-mid)">جارٍ التحميل...</div>`;
-
   try {
-    // حاول قراءة ملفات CMS الجديدة أولاً
-    let data = await loadJSONFiles('data/articles', base);
-
-    // إذا ما لقى شيء، اقرأ من data/articles.json القديم
-    if (!data.length) {
-      const res = await fetch(`${base}data/articles.json`);
-      if (res.ok) data = await res.json();
-    }
-
+    let data = await fetchData('articles.json');
     let filtered = data.filter(a =>
       (filter === 'الكل' || a.category === filter) &&
       (!searchQ || a.title?.includes(searchQ) || a.excerpt?.includes(searchQ))
     );
-
+    const isHome = container.id === 'home-articles-grid';
     if (isHome) filtered = filtered.slice(0, 3);
     const linkPrefix = isHome ? 'blog/' : '';
-
     container.innerHTML = filtered.length
-      ? filtered.map((a, i) => articleCard(a, linkPrefix).replace('class="article-card reveal"', `class="article-card reveal reveal-delay-${i % 3}"`)).join('')
+      ? filtered.map(a => articleCard(a, linkPrefix)).join('')
       : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--color-text-mid)">لا توجد مقالات بعد</div>`;
     initReveal();
-  } catch(e) {
-    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-mid)">تعذّر تحميل المقالات</div>`;
-  }
+  } catch(e) { container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px">تعذّر التحميل</div>`; }
 };
 
-// ── Render Files ───────────────────────────────────────────────
+// عرض الملفات
 const renderFiles = async (container, filter = 'الكل', searchQ = '') => {
   if (!container) return;
-  const isHome = container.id === 'home-files-grid';
-  const base = isHome ? '' : '../';
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-mid)">جارٍ التحميل...</div>`;
-
   try {
-    let data = await loadJSONFiles('data/library', base);
-    if (!data.length) {
-      const res = await fetch(`${base}data/files.json`);
-      if (res.ok) data = await res.json();
-    }
-
+    let data = await fetchData('files.json');
     let filtered = data.filter(f =>
       (filter === 'الكل' || f.category === filter) &&
       (!searchQ || f.title?.includes(searchQ) || f.description?.includes(searchQ))
     );
-
-    if (isHome) filtered = filtered.slice(0, 4);
-
+    if (container.id === 'home-files-grid') filtered = filtered.slice(0, 4);
     container.innerHTML = filtered.length
       ? filtered.map(f => fileCard(f)).join('')
       : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--color-text-mid)">لا توجد ملفات بعد</div>`;
     initReveal();
-  } catch(e) {
-    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px">تعذّر تحميل الملفات</div>`;
-  }
+  } catch(e) {}
 };
 
-// ── Render Courses ─────────────────────────────────────────────
+// عرض الدورات
 const renderCourses = async (container, filter = 'الكل') => {
   if (!container) return;
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-mid)">جارٍ التحميل...</div>`;
-
   try {
-    let data = await loadJSONFiles('data/courses', '../');
-    if (!data.length) {
-      const res = await fetch('../data/courses.json');
-      if (res.ok) data = await res.json();
-    }
-
+    let data = await fetchData('courses.json');
     const filtered = filter === 'الكل' ? data : data.filter(c => c.status === filter);
-
     container.innerHTML = filtered.length
       ? filtered.map(c => courseCard(c)).join('')
       : `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--color-text-mid)">لا توجد دورات بعد</div>`;
@@ -282,86 +228,75 @@ const renderCourses = async (container, filter = 'الكل') => {
   } catch(e) {}
 };
 
-// ── Load Settings ──────────────────────────────────────────────
-const loadSettings = async () => {
-  const isHome = !window.location.pathname.includes('/blog/') &&
-                 !window.location.pathname.includes('/about/') &&
-                 !window.location.pathname.includes('/library/') &&
-                 !window.location.pathname.includes('/courses/') &&
-                 !window.location.pathname.includes('/contact/');
-  const base = isHome ? '' : '../';
-  try {
-    const s = await fetch(`${base}data/settings.json`).then(r => r.ok ? r.json() : null);
-    if (!s) return;
-
-    // اسم الموقع
-    document.querySelectorAll('.nav-logo-name').forEach(el => el.textContent = s.name);
-
-    // الصورة الشخصية في الهيرو
-    const heroImg = document.querySelector('.hero-photo img');
-    if (heroImg && s.photo) heroImg.src = s.photo;
-
-    // النبذة في الهيرو
-    const heroDesc = document.querySelector('.hero-desc');
-    if (heroDesc && s.hero_bio) heroDesc.textContent = s.hero_bio;
-
-    // الإحصائيات
-    const stats = document.querySelectorAll('.stat-num');
-    if (stats[0] && s.stat_years) stats[0].dataset.target = parseInt(s.stat_years) || 4;
-    if (stats[1] && s.stat_sessions) stats[1].dataset.target = parseInt(s.stat_sessions) || 500;
-    if (stats[2] && s.stat_training) stats[2].dataset.target = parseInt(s.stat_training) || 180;
-
-    // الفوتر - إيميل وعنوان
-    document.querySelectorAll('.footer-email').forEach(el => el.textContent = s.email);
-    document.querySelectorAll('.footer-address').forEach(el => el.textContent = s.address);
-    document.querySelectorAll('.footer-hours').forEach(el => el.textContent = s.hours);
-  } catch(e) {}
-};
-
-// ── Load Single Article ────────────────────────────────────────
-const loadArticle = async () => {
-  const params = new URLSearchParams(location.search);
-  const slug = params.get('slug');
+// تحميل مقال مفرد بالـ slug
+const loadSingleArticle = async () => {
+  const slug = new URLSearchParams(location.search).get('slug');
   if (!slug) return;
-
   try {
-    // اقرأ الملف المباشر من مجلد articles
-    const res = await fetch(`../data/articles/${slug}.json`);
-    if (!res.ok) return;
-    const a = await res.json();
+    const data = await fetchData('articles.json');
+    const a = data.find(x => String(x.slug) === slug || String(x.id) === slug);
+    if (!a) { document.getElementById('article-title').textContent = 'المقال غير موجود'; return; }
 
     document.title = `${a.title} | أ. محمد القحطاني`;
-    const t = document.getElementById('article-title'); if (t) t.textContent = a.title;
-    const m = document.getElementById('article-meta');
-    if (m) m.innerHTML = `<span>${a.author||''}</span><span>·</span><span>${a.date||''}</span><span>·</span><span>${a.readTime||''}</span>`;
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('article-title', a.title);
+    setEl('article-category-bc', a.category || '');
+
     const cat = document.getElementById('article-category');
     if (cat) { cat.textContent = a.category||''; cat.style.background = a.categoryColor||'#1B2D4F'; }
 
-    // الصورة الرئيسية
-    const imgWrap = document.querySelector('.article-hero-img');
-    if (imgWrap && a.image) imgWrap.innerHTML = `<img src="${a.image}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover">`;
+    const meta = document.getElementById('article-meta');
+    if (meta) meta.innerHTML = `<span>✍️ ${a.author||''}</span><span>·</span><span>📅 ${a.date||''}</span><span>·</span><span>⏱️ ${a.readTime||''}</span>`;
 
-    // المحتوى (Markdown → HTML بسيط)
-    const body = document.querySelector('.article-body-content');
-    if (body && a.body) {
-      body.innerHTML = a.body
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/^(?!<[h|p])(.+)/gm, '<p>$1</p>');
-    }
+    const imgWrap = document.getElementById('article-hero-img');
+    if (imgWrap && a.image) imgWrap.innerHTML = `<img src="${a.image}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`;
 
-    // المراجع
-    const refs = document.querySelector('.article-references ol');
-    if (refs && a.references?.length) {
-      refs.innerHTML = a.references.map(r => `<li>${typeof r === 'string' ? r : r.ref}</li>`).join('');
+    const bodyEl = document.getElementById('article-body-content');
+    if (bodyEl && a.body) bodyEl.innerHTML = parseMarkdown(a.body);
+
+    if (a.references?.length) {
+      const sec = document.getElementById('article-references');
+      const list = document.getElementById('article-refs-list');
+      if (sec && list) {
+        sec.style.display = 'block';
+        list.innerHTML = a.references.map(r => `<li>${typeof r === 'string' ? r : (r.ref||'')}</li>`).join('');
+      }
     }
+  } catch(e) { console.error(e); }
+};
+
+// Markdown → HTML
+const parseMarkdown = (md) => {
+  const lines = md.split('\n');
+  let html = '', inList = false;
+  for (let line of lines) {
+    const fmt = line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+    if (line.startsWith('### ')) { if(inList){html+='</ul>';inList=false;} html+=`<h3 style="font-family:var(--font-heading);font-weight:700;font-size:20px;color:var(--color-primary);margin:28px 0 10px">${line.slice(4)}</h3>`; }
+    else if (line.startsWith('## ')) { if(inList){html+='</ul>';inList=false;} html+=`<h2 style="font-family:var(--font-heading);font-weight:700;font-size:24px;color:var(--color-primary);margin:36px 0 14px">${line.slice(3)}</h2>`; }
+    else if (line.startsWith('> ')) { if(inList){html+='</ul>';inList=false;} html+=`<div class="pull-quote">${line.slice(2)}</div>`; }
+    else if (line.startsWith('- ')) { if(!inList){html+='<ul style="padding-right:24px;margin:16px 0">'; inList=true;} html+=`<li style="margin-bottom:8px">${fmt.slice(2)}</li>`; }
+    else if (line.trim()==='') { if(inList){html+='</ul>';inList=false;} }
+    else { if(inList){html+='</ul>';inList=false;} if(!line.startsWith('<')) html+=`<p style="margin-bottom:18px;line-height:1.85;font-size:17px">${fmt}</p>`; else html+=fmt; }
+  }
+  if (inList) html += '</ul>';
+  return html;
+};
+
+// تحميل الإعدادات
+const loadSettings = async () => {
+  try {
+    const s = await fetch(getBase() + 'data/settings.json').then(r => r.ok ? r.json() : null);
+    if (!s) return;
+    document.querySelectorAll('.nav-logo-name').forEach(el => el.textContent = s.name||'');
+    const heroImg = document.querySelector('.hero-photo img');
+    if (heroImg && s.photo) heroImg.src = s.photo;
+    const heroDesc = document.querySelector('.hero-desc');
+    if (heroDesc && s.hero_bio) heroDesc.textContent = s.hero_bio;
   } catch(e) {}
 };
 
 // ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initLoader();
   initNav();
@@ -372,7 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initReadingBar();
   initContactForm();
   loadSettings();
-
   document.querySelectorAll('.btn-dark-toggle').forEach(b => b.addEventListener('click', toggleDark));
 
   // الرئيسية
@@ -385,20 +319,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const blogGrid = document.getElementById('blog-grid');
   if (blogGrid) {
     let cf = 'الكل', cs = '';
-    renderArticles(blogGrid, cf);
-    initChips('.filter-chips', v => { cf = v; renderArticles(blogGrid, v, cs); });
+    renderArticles(blogGrid);
+    initChips('.filter-chips', v => { cf=v; renderArticles(blogGrid, v, cs); });
     const bs = document.getElementById('blog-search');
-    if (bs) bs.addEventListener('input', e => { cs = e.target.value; renderArticles(blogGrid, cf, cs); });
+    if (bs) bs.addEventListener('input', e => { cs=e.target.value; renderArticles(blogGrid, cf, cs); });
   }
 
   // المكتبة
   const libGrid = document.getElementById('library-grid');
   if (libGrid) {
     let cc = 'الكل', cs = '';
-    renderFiles(libGrid, cc);
-    initCategorySidebar(cat => { cc = cat; renderFiles(libGrid, cat, cs); });
+    renderFiles(libGrid);
+    initCategorySidebar(cat => { cc=cat; renderFiles(libGrid, cat, cs); });
     const ls = document.getElementById('library-search');
-    if (ls) ls.addEventListener('input', e => { cs = e.target.value; renderFiles(libGrid, cc, cs); });
+    if (ls) ls.addEventListener('input', e => { cs=e.target.value; renderFiles(libGrid, cc, cs); });
   }
 
   // الدورات
@@ -409,12 +343,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // مقال مفرد
-  if (window.location.pathname.includes('article.html')) loadArticle();
+  if (window.location.pathname.includes('article.html')) loadSingleArticle();
 });
-
-// Helper: generate slug from title (same as CMS)
-const toSlug = (title) => title
-  .replace(/[^\u0600-\u06FF\s\w-]/g, '')
-  .trim()
-  .replace(/\s+/g, '-')
-  .toLowerCase();
