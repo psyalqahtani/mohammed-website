@@ -411,3 +411,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // مقال مفرد
   if (window.location.pathname.includes('article.html')) loadArticle();
 });
+
+// Helper: generate slug from title (same as CMS)
+const toSlug = (title) => title
+  .replace(/[^\u0600-\u06FF\s\w-]/g, '')
+  .trim()
+  .replace(/\s+/g, '-')
+  .toLowerCase();
