@@ -2,11 +2,9 @@ backend:
   name: git-gateway
   branch: main
 
-# رفع الصور والملفات
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
-# اللغة والمظهر
 locale: ar
 
 collections:
@@ -17,14 +15,16 @@ collections:
   - name: "articles"
     label: "📝 المقالات"
     label_singular: "مقال"
-    folder: "_articles"
+    folder: "data/articles"
     create: true
     slug: "{{slug}}"
+    extension: "json"
+    format: "json"
     editor:
       preview: false
     fields:
-      - { label: "العنوان", name: "title", widget: "string", hint: "عنوان المقال كما سيظهر في الموقع" }
-      - { label: "المقدمة المختصرة", name: "excerpt", widget: "text", hint: "جملة أو جملتان تظهران في بطاقة المقال" }
+      - { label: "العنوان", name: "title", widget: "string" }
+      - { label: "مقدمة مختصرة", name: "excerpt", widget: "text", hint: "جملتان تظهران في بطاقة المقال" }
       - label: "التصنيف"
         name: "category"
         widget: "select"
@@ -44,21 +44,22 @@ collections:
           - { label: "أخضر مائي", value: "#3D9B8F" }
           - { label: "ذهبي", value: "#B8976A" }
           - { label: "رمادي", value: "#5C6070" }
-      - { label: "تاريخ النشر", name: "date", widget: "datetime", format: "DD MMMM YYYY", hint: "سيظهر بالتنسيق العربي" }
-      - { label: "وقت القراءة (بالدقائق)", name: "readTime", widget: "number", default: 5, value_type: "int" }
+      - { label: "صورة المقال", name: "image", widget: "image", required: false, hint: "صورة تظهر في بطاقة المقال وأعلى الصفحة" }
+      - { label: "تاريخ النشر", name: "date", widget: "string", hint: "مثال: ١٨ يوليو ٢٠٢٦" }
+      - { label: "وقت القراءة", name: "readTime", widget: "string", hint: "مثال: ٥ دقائق قراءة" }
       - { label: "الكاتب", name: "author", widget: "string", default: "أ. محمد القحطاني" }
-      - { label: "صورة المقال", name: "image", widget: "image", required: false }
-      - label: "الوسوم"
-        name: "tags"
-        widget: "list"
-        hint: "أضف وسوماً للمقال مفصولة بفاصلة"
-      - { label: "مقال مميز؟", name: "featured", widget: "boolean", default: false }
-      - { label: "محتوى المقال", name: "body", widget: "markdown", hint: "اكتب محتوى المقال هنا بتنسيق Markdown" }
+      - { label: "محتوى المقال", name: "body", widget: "markdown" }
       - label: "المراجع العلمية"
         name: "references"
         widget: "list"
         required: false
-        hint: "أضف مرجعاً في كل سطر"
+        field: { label: "مرجع", name: "ref", widget: "string" }
+      - label: "الوسوم"
+        name: "tags"
+        widget: "list"
+        required: false
+        field: { label: "وسم", name: "tag", widget: "string" }
+      - { label: "مقال مميز؟", name: "featured", widget: "boolean", default: false }
 
   # ═══════════════════════════════
   # المكتبة العلمية
@@ -66,13 +67,15 @@ collections:
   - name: "library"
     label: "📚 المكتبة العلمية"
     label_singular: "ملف"
-    folder: "_library"
+    folder: "data/library"
     create: true
     slug: "{{slug}}"
+    extension: "json"
+    format: "json"
     editor:
       preview: false
     fields:
-      - { label: "اسم الملف", name: "title", widget: "string" }
+      - { label: "اسم الملف أو المادة", name: "title", widget: "string" }
       - { label: "وصف مختصر", name: "description", widget: "text" }
       - label: "نوع الملف"
         name: "type"
@@ -98,9 +101,10 @@ collections:
           - { label: "أخضر مائي", value: "#3D9B8F" }
           - { label: "ذهبي", value: "#B8976A" }
           - { label: "أزرق داكن", value: "#1B2D4F" }
-      - { label: "الملف للتحميل", name: "file", widget: "file", hint: "ارفع الملف هنا" }
-      - { label: "حجم الملف (مثال: 2.4 MB)", name: "size", widget: "string" }
-      - { label: "تاريخ الإضافة", name: "date", widget: "datetime", format: "MMMM YYYY" }
+      - { label: "صورة أو أيقونة مخصصة", name: "image", widget: "image", required: false }
+      - { label: "الملف للتحميل", name: "file", widget: "file", required: false, hint: "ارفع الملف هنا" }
+      - { label: "حجم الملف", name: "size", widget: "string", hint: "مثال: 2.4 MB" }
+      - { label: "تاريخ الإضافة", name: "date", widget: "string", hint: "مثال: يوليو ٢٠٢٦" }
 
   # ═══════════════════════════════
   # الدورات وورش العمل
@@ -108,9 +112,11 @@ collections:
   - name: "courses"
     label: "🎓 الدورات وورش العمل"
     label_singular: "دورة"
-    folder: "_courses"
+    folder: "data/courses"
     create: true
     slug: "{{slug}}"
+    extension: "json"
+    format: "json"
     editor:
       preview: false
     fields:
@@ -130,8 +136,9 @@ collections:
           - { label: "ذهبي (قادم)", value: "#B8976A" }
           - { label: "أخضر (جارٍ)", value: "#3D9B8F" }
           - { label: "رمادي (منتهٍ)", value: "#5C6070" }
+      - { label: "صورة الدورة", name: "image", widget: "image", required: false }
       - { label: "التاريخ", name: "date", widget: "string", hint: "مثال: ١٠ أغسطس ٢٠٢٦" }
-      - { label: "المدة", name: "duration", widget: "string", hint: "مثال: ٣ ساعات أو ٥ أيام" }
+      - { label: "المدة", name: "duration", widget: "string", hint: "مثال: ٣ ساعات" }
       - label: "طريقة التقديم"
         name: "mode"
         widget: "select"
@@ -139,7 +146,6 @@ collections:
           - { label: "أونلاين", value: "أونلاين" }
           - { label: "حضوري", value: "حضوري" }
           - { label: "هجين", value: "هجين" }
-      - { label: "صورة الدورة", name: "image", widget: "image", required: false }
 
   # ═══════════════════════════════
   # إعدادات الموقع
@@ -149,27 +155,22 @@ collections:
     files:
       - label: "المعلومات الشخصية"
         name: "personal"
-        file: "_data/personal.yml"
+        file: "data/settings.json"
         editor:
           preview: false
         fields:
           - { label: "الاسم الكامل", name: "name", widget: "string" }
           - { label: "اللقب المهني", name: "title", widget: "string" }
-          - { label: "نبذة مختصرة (للرئيسية)", name: "hero_bio", widget: "text" }
-          - { label: "نبذة كاملة (لصفحة عني)", name: "full_bio", widget: "text" }
+          - { label: "نبذة مختصرة (الرئيسية)", name: "hero_bio", widget: "text" }
           - { label: "البريد الإلكتروني", name: "email", widget: "string" }
           - { label: "العنوان", name: "address", widget: "string" }
           - { label: "أوقات العمل", name: "hours", widget: "string" }
           - { label: "الصورة الشخصية", name: "photo", widget: "image" }
-          - { label: "سنوات الخبرة", name: "stat_years", widget: "number" }
-          - { label: "عدد الجلسات", name: "stat_sessions", widget: "number" }
-          - { label: "ساعات التدريب", name: "stat_training", widget: "number" }
-          - label: "حسابات التواصل الاجتماعي"
-            name: "social"
-            widget: "object"
-            fields:
-              - { label: "تويتر/X", name: "twitter", widget: "string", required: false }
-              - { label: "إنستغرام", name: "instagram", widget: "string", required: false }
-              - { label: "لينكدإن", name: "linkedin", widget: "string", required: false }
-              - { label: "يوتيوب", name: "youtube", widget: "string", required: false }
-              - { label: "سناب شات", name: "snapchat", widget: "string", required: false }
+          - { label: "سنوات الخبرة", name: "stat_years", widget: "string" }
+          - { label: "عدد الجلسات", name: "stat_sessions", widget: "string" }
+          - { label: "ساعات التدريب", name: "stat_training", widget: "string" }
+          - { label: "تويتر / X", name: "twitter", widget: "string", required: false }
+          - { label: "إنستغرام", name: "instagram", widget: "string", required: false }
+          - { label: "لينكدإن", name: "linkedin", widget: "string", required: false }
+          - { label: "يوتيوب", name: "youtube", widget: "string", required: false }
+          - { label: "سناب شات", name: "snapchat", widget: "string", required: false }
