@@ -388,16 +388,31 @@ const loadSettings = async () => {
     }
 
     // ٥. الإحصائيات في الهيرو
+    // تحويل الأرقام العربية والإنجليزية + إزالة الرموز
+    const parseNum = val => {
+      if (!val) return NaN;
+      const arabicToEn = v => v.replace(/[٠١٢٣٤٥٦٧٨٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+      const cleaned = arabicToEn(String(val)).replace(/[^0-9]/g, '');
+      return parseInt(cleaned, 10);
+    };
+
     const statEls = document.querySelectorAll('.stat-num[data-target]');
-    const statMap = [
-      { el: statEls[0], field: 'stat_years'    },
-      { el: statEls[1], field: 'stat_sessions' },
-      { el: statEls[2], field: 'stat_training' },
+    const statDefs = [
+      { el: statEls[0], field: 'stat_years',    suffix: '+' },
+      { el: statEls[1], field: 'stat_sessions', suffix: '+'  },
+      { el: statEls[2], field: 'stat_training', suffix: ''   },
     ];
-    statMap.forEach(({ el, field }) => {
+    statDefs.forEach(({ el, field, suffix }) => {
       if (!el || !s[field]) return;
-      const num = parseInt(s[field]);
-      if (!isNaN(num)) el.dataset.target = num;
+      const raw = String(s[field]);
+      const num = parseNum(raw);
+      // استخرج الـ suffix من القيمة المخزّنة (+ أو أي رمز آخر)
+      const extractedSuffix = raw.replace(/[٠١٢٣٤٥٦٧٨٩0-9]/g, '').trim() || suffix;
+      if (!isNaN(num)) {
+        el.dataset.target  = num;
+        el.dataset.suffix  = extractedSuffix;
+        el.textContent     = '٠'; // إعادة تشغيل العداد
+      }
     });
 
     // ٦. روابط التواصل الاجتماعي
