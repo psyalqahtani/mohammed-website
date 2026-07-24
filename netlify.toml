@@ -1,11 +1,5 @@
 [build]
-  command = "node generate-manifest.js"
   publish = "."
-
-[[headers]]
-  for = "/admin/*"
-  [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
 
 [[headers]]
   for = "/*"
