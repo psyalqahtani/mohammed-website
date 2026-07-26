@@ -47,8 +47,73 @@ const merge = (inputFolder, outputFile) => {
   console.log(`✓ ${outputFile} ← ${files.length} ملف`);
 };
 
+const generateSitemap = () => {
+  const BASE = 'https://mohammed-alqahtani.netlify.app';
+  const today = new Date().toISOString().split('T')[0];
+
+  // الصفحات الثابتة
+  const staticPages = [
+    { url: '/',               priority: '1.0', changefreq: 'weekly'  },
+    { url: '/about/',         priority: '0.8', changefreq: 'monthly' },
+    { url: '/blog/',          priority: '0.9', changefreq: 'weekly'  },
+    { url: '/library/',       priority: '0.8', changefreq: 'weekly'  },
+    { url: '/courses/',       priority: '0.7', changefreq: 'monthly' },
+    { url: '/contact/',       priority: '0.6', changefreq: 'yearly'  },
+  ];
+
+  // المقالات
+  const articles = fs.existsSync('data/articles.json')
+    ? JSON.parse(fs.readFileSync('data/articles.json', 'utf8'))
+    : [];
+
+  // ملفات المكتبة
+  const library = fs.existsSync('data/library.json')
+    ? JSON.parse(fs.readFileSync('data/library.json', 'utf8'))
+    : [];
+
+  // الدورات
+  const courses = fs.existsSync('data/courses.json')
+    ? JSON.parse(fs.readFileSync('data/courses.json', 'utf8'))
+    : [];
+
+  const urlTag = ({ url, priority, changefreq, lastmod }) => `
+  <url>
+    <loc>${BASE}${url}</loc>
+    <lastmod>${lastmod || today}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticPages.map(urlTag).join('')}
+${articles.map(a => urlTag({
+    url: `/blog/article.html?slug=${a.slug}`,
+    priority: '0.8',
+    changefreq: 'monthly',
+    lastmod: today,
+  })).join('')}
+${library.map(f => urlTag({
+    url: `/library/`,
+    priority: '0.6',
+    changefreq: 'weekly',
+    lastmod: today,
+  })).join('')}
+${courses.map(c => urlTag({
+    url: `/courses/`,
+    priority: '0.6',
+    changefreq: 'monthly',
+    lastmod: today,
+  })).join('')}
+</urlset>`;
+
+  fs.writeFileSync('sitemap.xml', xml.trim(), 'utf8');
+  console.log(`✓ sitemap.xml ← ${staticPages.length} صفحة + ${articles.length} مقال + ${library.length} ملف + ${courses.length} دورة`);
+};
+
 console.log('\n🔨 بدء البناء...\n');
 merge('data/articles', 'data/articles.json');
 merge('data/library',  'data/library.json');
 merge('data/courses',  'data/courses.json');
+generateSitemap();
 console.log('\n✅ اكتمل البناء\n');

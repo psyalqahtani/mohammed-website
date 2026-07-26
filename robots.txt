@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /data/
+
+Sitemap: https://mohammed-alqahtani.netlify.app/sitemap.xml
