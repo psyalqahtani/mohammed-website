@@ -205,18 +205,36 @@ const articleCard = (a, linkPrefix = '') => `
     </div>
   </article>`;
 
-const fileCard = f => `
+const fileCard = f => {
+  const isStudy = f.category === 'دراسات حديثة';
+
+  // زر الإجراء — تحميل أو رابط خارجي
+  const actionBtn = f.file
+    ? `<a href="${f.file}" class="btn-download" download>تحميل PDF ↓</a>`
+    : f.external_url
+      ? `<a href="${f.external_url}" class="btn-download" target="_blank" rel="noopener noreferrer">عرض الدراسة ↗</a>`
+      : '';
+
+  // معلومات إضافية للدراسات
+  const studyMeta = isStudy ? `
+    ${f.authors ? `<div style="font-family:var(--font-ui);font-size:12px;color:var(--color-text-mid);margin-bottom:4px">✍️ ${f.authors}</div>` : ''}
+    ${f.journal ? `<div style="font-family:var(--font-ui);font-size:12px;color:var(--color-teal);margin-bottom:4px;font-style:italic">${f.journal}</div>` : ''}
+  ` : '';
+
+  const metaLine = [f.year || f.date, f.size].filter(Boolean).join(' · ');
+
+  return `
   <div class="file-card reveal">
     ${f.image
       ? `<img src="${f.image}" alt="${f.title}" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:12px">`
-      : `<div class="file-icon" style="background:${f.color || '#3D9B8F'}">${f.type || 'PDF'}</div>`}
+      : `<div class="file-icon" style="background:${f.color || '#3D9B8F'}">${isStudy ? '📄' : (f.type || 'PDF')}</div>`}
     <h4 class="file-title">${f.title || ''}</h4>
+    ${studyMeta}
     <p class="file-desc">${f.description || ''}</p>
-    <div class="file-meta">${f.size || ''} · ${f.date || ''}</div>
-    ${f.file
-      ? `<a href="${f.file}" class="btn-download" download>تحميل ↓</a>`
-      : `<button class="btn-download">تحميل ↓</button>`}
+    <div class="file-meta">${metaLine}</div>
+    ${actionBtn}
   </div>`;
+};
 
 const courseCard = c => `
   <div class="course-card reveal">

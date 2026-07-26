@@ -1,5 +1,22 @@
 [
   {
+    "id": 10,
+    "slug": "study-cbt-anxiety-2024",
+    "title": "فاعلية العلاج المعرفي السلوكي عبر الإنترنت في علاج اضطراب القلق العام",
+    "description": "دراسة عشوائية مضبوطة على ٢٤٠ مشاركاً تُثبت أن CBT المقدَّم رقمياً يُعادل في فاعليته الجلسات الوجاهية في تخفيف أعراض القلق العام خلال ١٢ أسبوعاً.",
+    "type": "PDF",
+    "category": "دراسات حديثة",
+    "color": "#1B2D4F",
+    "file": "",
+    "external_url": "https://pubmed.ncbi.nlm.nih.gov",
+    "journal": "Journal of Consulting and Clinical Psychology",
+    "year": "٢٠٢٤",
+    "authors": "Cuijpers, P., et al.",
+    "image": "",
+    "size": "",
+    "date": "يوليو ٢٠٢٦"
+  },
+  {
     "id": 6,
     "title": "أسس الصحة النفسية — محاضرة تعريفية",
     "description": "عرض شامل يغطي المفاهيم الأساسية في الصحة النفسية للعموم",

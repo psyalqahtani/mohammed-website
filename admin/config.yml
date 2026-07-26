@@ -132,6 +132,7 @@ collections:
           - { label: "مقاييس نفسية", value: "مقاييس نفسية" }
           - { label: "عروض تقديمية", value: "عروض تقديمية" }
           - { label: "كتب", value: "كتب" }
+          - { label: "📰 دراسات حديثة", value: "دراسات حديثة" }
       - label: "لون الأيقونة"
         name: "color"
         widget: "select"
@@ -139,11 +140,31 @@ collections:
           - { label: "أخضر مائي", value: "#3D9B8F" }
           - { label: "ذهبي", value: "#B8976A" }
           - { label: "أزرق داكن", value: "#1B2D4F" }
-      - label: "الملف للتحميل"
+      - label: "الملف للتحميل (PDF)"
         name: "file"
         widget: "file"
         required: false
-        hint: "ارفع الملف PDF أو PPT هنا"
+        hint: "ارفع الملف مباشرة إذا أمكن"
+      - label: "رابط الدراسة الخارجي"
+        name: "external_url"
+        widget: "string"
+        required: false
+        hint: "رابط PubMed أو المجلة إذا لم يكن PDF متاحاً"
+      - label: "اسم المجلة"
+        name: "journal"
+        widget: "string"
+        required: false
+        hint: "مثال: Journal of Consulting and Clinical Psychology"
+      - label: "سنة النشر"
+        name: "year"
+        widget: "string"
+        required: false
+        hint: "مثال: ٢٠٢٤"
+      - label: "الباحثون"
+        name: "authors"
+        widget: "string"
+        required: false
+        hint: "مثال: Smith, J., et al."
       - label: "صورة مخصصة"
         name: "image"
         widget: "image"
